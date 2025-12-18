@@ -2,6 +2,7 @@ version: '2'
 volumes:
     config:
     mosquitto:
+    tailscale:
 services:
   homeassistant:
     build: homeassistant
@@ -27,3 +28,18 @@ services:
       - 'config:/hass-config'
     environment:
       - HC_BASEPATH=/hass-config
+  # https://github.com/klutchell/balena-tailscale
+  tailscale:
+    build: tailscale
+    restart: on-failure
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    labels:
+      io.balena.features.kernel-modules: 1
+    tmpfs:
+      - /tmp
+      - /var/run/
+    volumes:
+      - tailscale:/var/lib/tailscale
