@@ -4,6 +4,7 @@ volumes:
   config:
   adguardhome_work:
   adguardhome_conf:
+  tailscale:
     
 services:
 
@@ -39,3 +40,19 @@ services:
       - 'adguardhome_work:/opt/adguardhome/work:rw'
       - 'adguardhome_conf:/opt/adguardhome/conf:rw'
     command: --host 0.0.0.0 --port 8000 --no-check-update --config /opt/adguardhome/conf/AdGuardHome.yaml
+
+  # https://github.com/klutchell/balena-tailscale
+  tailscale:
+    build: tailscale
+    restart: on-failure
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    labels:
+      io.balena.features.kernel-modules: 1
+    tmpfs:
+      - /tmp
+      - /var/run/
+    volumes:
+      - tailscale:/var/lib/tailscale
